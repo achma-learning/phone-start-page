@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Age & Mortality Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f3f4f6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2 {
+      margin: 20px 0;
+      color: #555;
+    }
+
+    .age-display {
+      font-size: 48px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .age-display span {
+      font-size: 24px;
+      color: #888;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+      gap: 2px;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 20px;
+      height: 20px;
+      background-color: #ccc;
+    }
+
+    .cell.passed {
+      background-color: #007bff;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    /* Responsive Design for Mobile Screens */
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(15px, 1fr));
+        gap: 1px;
+      }
+
+      .cell {
+        width: 15px;
+        height: 15px;
+      }
+
+      .age-display {
+        font-size: 36px;
+      }
+
+      .age-display span {
+        font-size: 18px;
+      }
+    }
+
+    /* Perplexity Search Bar Styling */
+    .search-bar {
+      margin: 20px auto;
+      max-width: 400px;
+    }
+
+    .search-bar input {
+      width: 70%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .search-bar button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .search-bar button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Perplexity Search Bar -->
+  <div class="search-bar">
+    <input type="text" id="search-query" placeholder="Search with Perplexity AI">
+    <button onclick="searchPerplexity()">Search</button>
+  </div>
+
+  <h1>Age & Mortality Tracker</h1>
+
+  <!-- Live Age Display -->
+  <h2>Live Age</h2>
+  <div class="age-display" id="age-display"></div>
+
+  <!-- Mortality Tracker -->
+  <h2>Mortality Tracker</h2>
+  <div class="results">
+    <p id="remaining-years"></p>
+    <div class="grid" id="life-grid"></div>
+  </div>
+
+  <script>
+    // Birthdate and Life Expectancy
+    const birthDate = new Date("2004-03-17T00:00:00"); // Change as needed
+    const lifeExpectancy = 70; // Fixed life expectancy (in years)
+
+    // Function to calculate exact age
+    function calculateExactAge(birthDate) {
+      const now = new Date();
+      const ageInMilliseconds = now - birthDate;
+      const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25); // Milliseconds to years
+      return ageInYears;
+    }
+
+    // Function to calculate and display mortality tracker
+    function calculateMortality() {
+      const currentAge = Math.floor(calculateExactAge(birthDate)); // Age rounded down
+      const totalWeeks = lifeExpectancy * 52; // Total weeks in life expectancy
+      const passedWeeks = currentAge * 52; // Weeks lived
+      const remainingWeeks = totalWeeks - passedWeeks;
+
+      // Display remaining time
+      if (currentAge >= lifeExpectancy) {
+        document.getElementById("remaining-years").innerText =
+          `You are ${currentAge} years old. You have surpassed the life expectancy of ${lifeExpectancy} years.`;
+        return;
+      }
+
+      document.getElementById("remaining-years").innerText = 
+        `You are ${currentAge} years old. You have approximately ${remainingWeeks} weeks left (${lifeExpectancy - currentAge} years).`;
+
+      // Display the mortality grid
+      const grid = document.getElementById("life-grid");
+      grid.innerHTML = ""; // Clear existing grid
+      for (let i = 0; i < totalWeeks; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        if (i < passedWeeks) {
+          cell.classList.add("passed");
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    // Function to update the live age display every 100ms
+    function updateAgeDisplay() {
+      const exactAge = calculateExactAge(birthDate);
+      const integerPart = Math.floor(exactAge);
+      const fractionalPart = (exactAge % 1).toFixed(9).slice(1); // Fractional part with 8 decimals
+      document.getElementById("age-display").innerHTML = `${integerPart}<span>${fractionalPart}</span>`;
+    }
+
+    // Function for Perplexity Search
+    function searchPerplexity() {
+      const query = document.getElementById("search-query").value;
+      if (query.trim() !== "") {
+        const url = `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`;
+        window.open(url, "_blank");
+      } else {
+        alert("Please enter a search query.");
+      }
+    }
+
+    // Initial calculations on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      calculateMortality(); // Render the mortality tracker
+      setInterval(updateAgeDisplay, 100); // Update live age every 100ms
+    });
+  </script>
+</body>
+</html>
